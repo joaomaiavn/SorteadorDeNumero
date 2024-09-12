@@ -1,0 +1,1 @@
+O projeto "Sorteador de Numeros" foi desenvolvido para gerar a quantidade de numeros que o usuário desejar, podendo sortear somente numeros  positivos. A nossa ideia é ampliar isso para além de número sortear nomes também.
