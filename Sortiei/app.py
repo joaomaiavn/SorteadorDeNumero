@@ -2,9 +2,11 @@ import tkinter as tk
 from tkinter import messagebox
 import random
 
-# Lista para armazenar os participantes sorteados
+# Variáveis globais
 participantes = []
 sorteados = []
+numeros_disponiveis = []
+numeros_sorteados = []
 
 # Função para dividir participantes em equipes
 def sortear_equipes():
@@ -51,25 +53,66 @@ def sortear_individual():
     resultado_text.delete(1.0, tk.END)
     resultado_text.insert(tk.END, f"Sorteado: {nome_sorteado}\n")
 
+# Função para sortear números sem repetição
+def sortear_numeros():
+    global numeros_disponiveis, numeros_sorteados
+    
+    try:
+        total_numeros = int(numeros_entry.get())
+        
+        if not numeros_disponiveis:
+            numeros_disponiveis = list(range(1, total_numeros + 1))
+            numeros_sorteados = []
+
+        if len(numeros_disponiveis) == 0:
+            resultado_text.delete(1.0, tk.END)
+            resultado_text.insert(tk.END, "Todos os números foram sorteados!\n")
+            return
+
+        numero_sorteado = random.choice(numeros_disponiveis)
+        numeros_sorteados.append(numero_sorteado)
+        numeros_disponiveis.remove(numero_sorteado)
+        
+        resultado_text.delete(1.0, tk.END)
+        resultado_text.insert(tk.END, f"Número sorteado: {numero_sorteado}\n")
+        
+        if len(numeros_disponiveis) == 0:
+            resultado_text.insert(tk.END, "Todos os números já foram sorteados!\n")
+    
+    except ValueError:
+        messagebox.showerror("Erro", "Por favor, insira um número válido!")
+
 # Função para exibir o campo correto de acordo com a escolha do usuário
 def mostrar_opcao(opcao):
+    esconder_todos_campos()
+    
     if opcao == 'time':
         equipe_label.pack(pady=10)
         equipe_entry.pack(pady=10)
         sortear_time_btn.pack(pady=10)
-        sortear_individual_btn.pack_forget()  # Oculta o botão de sorteio individual
-        continuar_btn.pack_forget()
     elif opcao == 'individual':
-        equipe_label.pack_forget()  # Oculta o campo de equipe
-        equipe_entry.pack_forget()
-        sortear_time_btn.pack_forget()  # Oculta o botão de times
         sortear_individual_btn.pack(pady=10)
         continuar_btn.pack(pady=10)
+    elif opcao == 'numeros':
+        numeros_label.pack(pady=10)
+        numeros_entry.pack(pady=10)
+        sortear_numeros_btn.pack(pady=10)
+
+# Função para esconder todos os campos antes de exibir o campo correto
+def esconder_todos_campos():
+    equipe_label.pack_forget()
+    equipe_entry.pack_forget()
+    sortear_time_btn.pack_forget()
+    sortear_individual_btn.pack_forget()
+    continuar_btn.pack_forget()
+    numeros_label.pack_forget()
+    numeros_entry.pack_forget()
+    sortear_numeros_btn.pack_forget()
 
 # Cria a janela principal
 janela = tk.Tk()
 janela.title("Sortiei")
-janela.geometry("1920x1080")
+janela.geometry("800x600")
 
 # Título
 titulo = tk.Label(janela, text="Sortiei", font=("Arial", 16))
@@ -88,6 +131,8 @@ opcao_time_btn = tk.Button(janela, text="Escolha de Time", command=lambda: mostr
 opcao_time_btn.pack(pady=5)
 opcao_individual_btn = tk.Button(janela, text="Sorteio Individual", command=lambda: mostrar_opcao('individual'))
 opcao_individual_btn.pack(pady=5)
+opcao_numeros_btn = tk.Button(janela, text="Sorteio de Números", command=lambda: mostrar_opcao('numeros'))
+opcao_numeros_btn.pack(pady=5)
 
 # Entrada para o número de equipes
 equipe_label = tk.Label(janela, text="Número de pessoas por equipe:")
@@ -98,9 +143,14 @@ sortear_time_btn = tk.Button(janela, text="Sortear Equipes", command=sortear_equ
 
 # Botão para realizar o sorteio individual
 sortear_individual_btn = tk.Button(janela, text="Iniciar Sorteio Individual", command=sortear_individual)
-
-# Botão para continuar o sorteio individual (próximo nome)
 continuar_btn = tk.Button(janela, text="Continuar", command=sortear_individual)
+
+# Entrada para o sorteio de números
+numeros_label = tk.Label(janela, text="Digite a quantidade total de números:")
+numeros_entry = tk.Entry(janela)
+
+# Botão para realizar o sorteio de números
+sortear_numeros_btn = tk.Button(janela, text="Sortear Número", command=sortear_numeros)
 
 # Área de texto para exibir os resultados
 resultado_text = tk.Text(janela, height=10, width=50)
